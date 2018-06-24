@@ -2,6 +2,7 @@
 
 /include/ "mt6580.dtsi"
 /include/ "cust_eint.dtsi"
+/include/ "cust_i2c.dtsi"
 
 / {
 	memory@80000000 {
