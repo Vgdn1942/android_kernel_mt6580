@@ -59,6 +59,10 @@ ifeq ($(CONFIG_MTK_MC3XXX_AUTO),y)
 obj-y   +=  mc3xxx_auto/
 endif
 
+ifeq ($(CONFIG_MTK_MC3XXX),y)
+obj-y   +=  mc3xxx/
+endif
+
 ifeq ($(CONFIG_MTK_MPU60X0),y)
 obj-y   +=  mpu60x0/
 endif

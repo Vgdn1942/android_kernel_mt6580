@@ -100,6 +100,7 @@ NSFeature :  : RAWSensorInfo < _id >  :  : getFlickerPara \
 /*IMX*/
 #define IMX220_SENSOR_ID                        0x0220
 #define IMX219_SENSOR_ID                        0x0219
+//#define IMX219_SENSOR_ID            			0x0119
 #define IMX215_SENSOR_ID                        0x0215
 #define IMX214_SENSOR_ID                        0x0214
 #define IMX179_SENSOR_ID                        0x0179

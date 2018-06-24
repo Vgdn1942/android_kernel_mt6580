@@ -30,6 +30,9 @@ endif
 ifeq ($(CONFIG_MTK_MC3410_NEW),y)
 obj-y   +=  accelerometer/mc3410-new/
 endif
+ifeq ($(CONFIG_MTK_MC3XXX),y)
+obj-y   +=  accelerometer/mc3xxx/
+endif
 
 ifeq ($(CONFIG_MTK_ITG1010_NEW),y)
 obj-y   +=  gyroscope/ITG1010-new/

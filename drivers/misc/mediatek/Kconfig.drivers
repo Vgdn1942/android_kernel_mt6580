@@ -587,7 +587,11 @@ config MTK_KXTJ2_1009_NEW
 config MTK_MC3XXX_AUTO
         bool "MTK_MC3XXX_AUTO for MediaTek package"
         default n
-        
+
+config MTK_MC3XXX
+        bool "MTK_MC3XXX for MediaTek package"
+        default n
+
 config MTK_BMA250E
         bool "MTK_BMA250E for MediaTek package"
         default n
