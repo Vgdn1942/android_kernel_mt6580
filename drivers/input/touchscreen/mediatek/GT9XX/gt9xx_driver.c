@@ -875,10 +875,19 @@ static int tpd_power_on(struct i2c_client *client)
 	GTP_GPIO_OUTPUT(GTP_RST_PORT, 0);
 	msleep(10);
 	/* power on, need confirm with SA */
+#ifdef CONFIG_ARCH_MT6580
+		ret=regulator_set_voltage(tpd->reg, 2800000, 2800000);  // set 2.8v
+		if (ret)
+			GTP_DEBUG("regulator_set_voltage() failed!\n");
+		ret=regulator_enable(tpd->reg);  //enable regulator
+		if (ret)
+			GTP_DEBUG("regulator_enable() failed!\n");
+#else
 #ifdef TPD_POWER_SOURCE_CUSTOM
 	hwPowerOn(TPD_POWER_SOURCE_CUSTOM, VOL_2800, "TP");
 #else
 	hwPowerOn(MT65XX_POWER_LDO_VGP2, VOL_2800, "TP");
+#endif
 #endif
 #ifdef TPD_POWER_SOURCE_1800
 	hwPowerOn(TPD_POWER_SOURCE_1800, VOL_1800, "TP");
@@ -1523,10 +1532,16 @@ static s8 gtp_enter_sleep(struct i2c_client *client)
 	GTP_GPIO_OUTPUT(GTP_RST_PORT, 0);
 	msleep(5);
 
+#ifdef CONFIG_ARCH_MT6580
+		ret=regulator_disable(tpd->reg); //disable regulator
+		if (ret)
+			GTP_DEBUG("regulator_disable() failed!\n");
+#else
 #ifdef TPD_POWER_SOURCE_CUSTOM
 	hwPowerDown(TPD_POWER_SOURCE_CUSTOM, "TP");
 #else
 	hwPowerDown(MT65XX_POWER_LDO_VGP2, "TP");
+#endif
 #endif
 #ifdef TPD_POWER_SOURCE_1800
 	hwPowerDown(TPD_POWER_SOURCE_1800, "TP");
@@ -1662,11 +1677,18 @@ static void tpd_resume(struct early_suspend *h)
 
 static void tpd_off(void)
 {
+	int ret = 0;
 
+#ifdef CONFIG_ARCH_MT6580
+		ret=regulator_disable(tpd->reg); //disable regulator
+		if (ret)
+			GTP_DEBUG("regulator_disable() failed!\n");
+#else
 #ifdef TPD_POWER_SOURCE_CUSTOM
 	hwPowerDown(TPD_POWER_SOURCE_CUSTOM, "TP");
 #else
 	hwPowerDown(MT65XX_POWER_LDO_VGP2, "TP");
+#endif
 #endif
 #ifdef TPD_POWER_SOURCE_1800
 	hwPowerDown(TPD_POWER_SOURCE_1800, "TP");

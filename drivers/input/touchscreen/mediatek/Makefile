@@ -43,6 +43,10 @@ ifeq ($(CONFIG_TOUCHSCREEN_MTK_GT9XX_HOTKNOT_WEAR),y)
 obj-y	+=  GT9XX_hotknot_wear/
 endif
 
+ifeq ($(CONFIG_TOUCHSCREEN_MTK_GT9XX_HOTKNOT_P350),y)
+obj-y	+=  GT9XX_hotknot_P350/
+endif
+
 ifeq ($(CONFIG_TOUCHSCREEN_MTK_GT818B_FPGA),y)
 obj-y	+=  GT818B-fpga/
 endif
