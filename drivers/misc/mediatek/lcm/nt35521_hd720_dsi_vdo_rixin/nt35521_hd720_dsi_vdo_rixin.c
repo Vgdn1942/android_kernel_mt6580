@@ -8,11 +8,11 @@
 //  Local Constants
 // ---------------------------------------------------------------------------
 
-#define FRAME_WIDTH											(720)
-#define FRAME_HEIGHT										(1280)
+#define FRAME_WIDTH                                         (720)
+#define FRAME_HEIGHT                                        (1280)
 
-#define REGFLAG_DELAY										0xFC
-#define REGFLAG_END_OF_TABLE								0xFD
+#define REGFLAG_DELAY                                       0xFC
+#define REGFLAG_END_OF_TABLE                                0xFD
 
 // ---------------------------------------------------------------------------
 //  Local Variables
@@ -248,9 +248,9 @@ static void lcm_get_params(LCM_PARAMS *params)
 {
     memset(params, 0, sizeof(LCM_PARAMS));
 
-    params->type	= LCM_TYPE_DSI;
-    params->width	= FRAME_WIDTH;
-    params->height	= FRAME_HEIGHT;
+    params->type    = LCM_TYPE_DSI;
+    params->width   = FRAME_WIDTH;
+    params->height  = FRAME_HEIGHT;
 
     params->dsi.LANE_NUM = LCM_THREE_LANE;
     params->dsi.packet_size = 256;
@@ -263,15 +263,15 @@ static void lcm_get_params(LCM_PARAMS *params)
     params->dsi.PS = LCM_PACKED_PS_24BIT_RGB888;
     params->dsi.vertical_sync_active = 2;
 
-    params->dsi.horizontal_active_pixel	= FRAME_WIDTH;
-    params->dsi.vertical_active_line	= FRAME_HEIGHT;
-    params->dbi.te_mode					= LCM_DBI_TE_MODE_DISABLED;
+    params->dsi.horizontal_active_pixel = FRAME_WIDTH;
+    params->dsi.vertical_active_line    = FRAME_HEIGHT;
+    params->dbi.te_mode                 = LCM_DBI_TE_MODE_DISABLED;
 
     //The following defined the format for data coming from LCD engine.
-    params->dsi.data_format.color_order	= LCM_COLOR_ORDER_RGB;
-    params->dsi.data_format.trans_seq	= LCM_DSI_TRANS_SEQ_MSB_FIRST;
-    params->dsi.data_format.padding		= LCM_DSI_PADDING_ON_LSB;
-    params->dsi.data_format.format		= LCM_DSI_FORMAT_RGB888;
+    params->dsi.data_format.color_order = LCM_COLOR_ORDER_RGB;
+    params->dsi.data_format.trans_seq   = LCM_DSI_TRANS_SEQ_MSB_FIRST;
+    params->dsi.data_format.padding     = LCM_DSI_PADDING_ON_LSB;
+    params->dsi.data_format.format      = LCM_DSI_FORMAT_RGB888;
 
     params->dsi.mode = SYNC_PULSE_VDO_MODE;
 
@@ -282,10 +282,10 @@ static void lcm_get_params(LCM_PARAMS *params)
     params->dsi.ssc_disable = 1;
     params->dsi.compatibility_for_nvk = 1;
 
-    params->dsi.vertical_backporch		= 20;
-    params->dsi.vertical_frontporch		= 20;
-    params->dsi.horizontal_backporch	= 40;
-    params->dsi.horizontal_frontporch	= 40;
+    params->dsi.vertical_backporch      = 20;
+    params->dsi.vertical_frontporch     = 20;
+    params->dsi.horizontal_backporch    = 40;
+    params->dsi.horizontal_frontporch   = 40;
 }
 
 static void lcm_init(void)
