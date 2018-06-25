@@ -108,10 +108,11 @@ endif
 ifeq ($(CONFIG_TOUCHSCREEN_SYNAPTICS_S3528),y)
 obj-y   +=  synaptics_3528/
 endif
+
 ifeq ($(CONFIG_TOUCHSCREEN_SYNAPTICS_S5250),y)
 obj-y   +=  synaptics_s5250/
 endif
-$(warning errorlogxxxxlog:$(strip $(CONFIG_TOUCHSCREEN_SYNAPTICS_S5250)))
+
 ifeq ($(CONFIG_TOUCHSCREEN_SYNAPTICS),y)
 obj-y   +=  synaptics/
 endif
