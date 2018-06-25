@@ -8,8 +8,13 @@
 //  Local Constants
 // ---------------------------------------------------------------------------
 
-#define REGFLAG_DELAY 0xFC
-#define REGFLAG_END_OF_TABLE 0xFD
+#define FRAME_WIDTH  										(720)
+#define FRAME_HEIGHT 										(1280)
+
+#define REGFLAG_DELAY  										0xFC
+#define REGFLAG_END_OF_TABLE  								0xFD
+
+#define LCM_DSI_CMD_MODE									1
 
 // ---------------------------------------------------------------------------
 //  Local Variables
@@ -207,6 +212,11 @@ static struct LCM_setting_table lcm_initialization_setting[] = {
     {REGFLAG_END_OF_TABLE, 0x00, {0x00}}
 };
 
+static struct LCM_setting_table lcm_backlight_level_setting[] = {
+    {0x51, 1, {0xFF}},
+    {REGFLAG_END_OF_TABLE, 0x00, {}}
+};
+
 static void push_table(struct LCM_setting_table *table, unsigned int count, unsigned char force_update)
 {
     unsigned int i;
@@ -245,32 +255,49 @@ static void lcm_get_params(LCM_PARAMS *params)
 {
     memset(params, 0, sizeof(LCM_PARAMS));
 
-    params->dsi.LANE_NUM = 3;
+    params->type = LCM_TYPE_DSI;
+    params->width = FRAME_WIDTH;
+    params->height = FRAME_HEIGHT;
+
+    params->dsi.LANE_NUM = LCM_THREE_LANE;
     params->dsi.packet_size = 256;
     params->dsi.word_count = 2160;
     params->dsi.horizontal_sync_active = 4;
     params->dsi.lcm_esd_check_table[0].cmd = 10;
     params->dsi.lcm_esd_check_table[0].para_list[0] = -100;
     params->dsi.PLL_CLOCK = 239;
-    params->type = 2;
-    params->dsi.data_format.format = 2;
-    params->dsi.PS = 2;
+
+    params->dsi.PS = LCM_PACKED_PS_24BIT_RGB888;
     params->dsi.vertical_sync_active = 2;
-    params->width = 720;
-    params->dsi.horizontal_active_pixel = 720;
-    params->height = 1280;
-    params->dsi.vertical_active_line = 1280;
-    params->dbi.te_mode = 0;
-    params->dsi.data_format.color_order = 0;
-    params->dsi.data_format.trans_seq = 0;
-    params->dsi.data_format.padding = 0;
+
+    params->dsi.horizontal_active_pixel = FRAME_WIDTH;
+    params->dsi.vertical_active_line = FRAME_HEIGHT;
+    params->dbi.te_mode = LCM_DBI_TE_MODE_DISABLED;
+
+    //The following defined the format for data coming from LCD engine.
+    params->dsi.data_format.color_order = LCM_COLOR_ORDER_RGB;
+    params->dsi.data_format.trans_seq = LCM_DSI_TRANS_SEQ_MSB_FIRST;
+    params->dsi.data_format.padding = LCM_DSI_PADDING_ON_LSB;
+    params->dsi.data_format.format = LCM_DSI_FORMAT_RGB888;
+
+#if 0
+#if (LCM_DSI_CMD_MODE)
+    params->dsi.mode        = CMD_MODE;
+    params->dsi.switch_mode = SYNC_PULSE_VDO_MODE;
+#else
+    params->dsi.mode        = SYNC_PULSE_VDO_MODE;
+#endif
+#endif
+    params->dsi.mode        = SYNC_PULSE_VDO_MODE;
+
+
     params->dsi.intermediat_buffer_num = 0;
-    params->dsi.mode = 1;
     params->dsi.esd_check_enable = 1;
     params->dsi.customization_esd_check_enable = 1;
     params->dsi.lcm_esd_check_table[0].count = 1;
     params->dsi.ssc_disable = 1;
     params->dsi.compatibility_for_nvk = 1;
+
     params->dsi.vertical_backporch = 20;
     params->dsi.vertical_frontporch = 20;
     params->dsi.horizontal_backporch = 40;
@@ -304,6 +331,26 @@ static unsigned int lcm_compare_id(void)
     return 1; // хак, работает только если компилировать с одным LCM, но если охота поддерживать несколько ревезий или телефонов в одном ядре - пиши, поправлю
 }
 
+static void lcm_setbacklight(unsigned int level)
+{
+	unsigned int default_level = 145;
+	unsigned int mapped_level = 0;
+
+	//for LGE backlight IC mapping table
+	if(level > 255) 
+			level = 255;
+ 
+	if(level > 0) 
+			mapped_level = default_level+(level)*(255-default_level)/(255);
+	else
+			mapped_level = 0;
+
+	// Refresh value of backlight level.
+	lcm_backlight_level_setting[0].para_list[0] = mapped_level;
+
+	push_table(lcm_backlight_level_setting, sizeof(lcm_backlight_level_setting) / sizeof(struct LCM_setting_table), 1);
+}
+
 LCM_DRIVER nt35521_hd720_dsi_vdo_rixin_lcm_drv = {
         .name = "nt35521_hd720_dsi_vdo_rixin",
         .set_util_funcs = lcm_set_util_funcs,
@@ -312,4 +359,8 @@ LCM_DRIVER nt35521_hd720_dsi_vdo_rixin_lcm_drv = {
         .compare_id = lcm_compare_id,
         .suspend = lcm_suspend,
         .resume = lcm_resume,
+#if (LCM_DSI_CMD_MODE)
+        .set_backlight	= lcm_setbacklight
+#endif
 };
+
