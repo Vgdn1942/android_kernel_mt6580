@@ -18,6 +18,7 @@ obj-$(CONFIG_MTK_LEDS)   +=  leds/
 obj-$(CONFIG_MTK_ACCDET)   +=  accdet/
 
 ifeq ($(CONFIG_MTK_SENSOR_SUPPORT),y)
+
 ifeq ($(CONFIG_MTK_CM36652_NEW),y)
 obj-y	+=  alsps/cm36652-new/
 endif
@@ -27,6 +28,10 @@ endif
 ifeq ($(CONFIG_MTK_LTR553_S5030),y)
 obj-y	+=  alsps/ltr553/
 endif
+ifeq ($(CONFIG_MTK_STK3X1X_NEW),y)
+obj-y	+=  alsps/stk3x1x-new/
+endif
+
 ifeq ($(CONFIG_MTK_MC3410_NEW),y)
 obj-y   +=  accelerometer/mc3410-new/
 endif
@@ -36,6 +41,12 @@ endif
 ifeq ($(CONFIG_MTK_MC3XXX_AUTO),y)
 obj-y   +=  accelerometer/mc3xxx_auto/
 endif
+ifeq ($(CONFIG_MTK_BMA222E_NEW),y)
+obj-y   +=  accelerometer/bma222E-new/
+endif
+ifeq ($(CONFIG_MTK_KXTJ2_1009_NEW),y)
+obj-y   +=  accelerometer/KXTJ2_1009-new/
+endif
 
 ifeq ($(CONFIG_MTK_ITG1010_NEW),y)
 obj-y   +=  gyroscope/ITG1010-new/
@@ -43,12 +54,6 @@ endif
 
 ifeq ($(CONFIG_MTK_AKM09911_NEW),y)
 obj-y	+=  magnetometer/akm09911-new/
-endif
-ifeq ($(CONFIG_MTK_BMA222E_NEW),y)
-obj-y   +=  accelerometer/bma222E-new/
-endif
-ifeq ($(CONFIG_MTK_KXTJ2_1009_NEW),y)
-obj-y   +=  accelerometer/KXTJ2_1009-new/
 endif
 
 endif

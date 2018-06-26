@@ -3,9 +3,9 @@
 #include <cust_alsps.h>
 
 static struct alsps_hw cust_alsps_hw = {
-    .i2c_num    = 1,
-    .polling_mode_ps =0, //0: interrupt mode
-    .polling_mode_als =1,
+    .i2c_num    = 2,
+    .polling_mode_ps = 0, //0: interrupt mode
+    .polling_mode_als = 1,
     .power_id   = MT65XX_POWER_NONE,    /*LDO is not used*/
     .power_vol  = VOL_DEFAULT,          /*LDO is not used*/
     .i2c_addr   = {0x90, 0x00, 0x00, 0x00},	/*STK3x1x*/
@@ -27,7 +27,8 @@ static struct alsps_hw cust_alsps_hw = {
     .ps_threshold_low = 46,
 };
 
-struct alsps_hw *get_cust_alsps_hw(void) {
-    return &cust_alsps_hw;
+struct alsps_hw* get_cust_alsps_hw(void)
+{
+    return (&cust_alsps_hw);
 }
 

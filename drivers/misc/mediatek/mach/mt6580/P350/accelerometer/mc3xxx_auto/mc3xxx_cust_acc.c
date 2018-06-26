@@ -11,7 +11,7 @@
 static struct acc_hw mc3xxx_cust_acc =
 {
     .i2c_num   = 2,
-    .direction = 4,// 6,
+    .direction = 7,                    /* !< Value 1 - 7                   */
     .power_id  = MT65XX_POWER_NONE,    /* !< LDO is not used               */
     .power_vol = VOL_DEFAULT,          /* !< LDO is not used               */
     .firlen    = 0,                    /* !< don't enable low pass fileter */

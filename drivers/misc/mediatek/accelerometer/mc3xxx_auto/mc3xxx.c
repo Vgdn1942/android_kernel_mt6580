@@ -858,6 +858,8 @@ static int psensor_ps_operate(void* self, uint32_t command, void* buff_in, int s
  *****************************************/
 static void MC3XXX_power(struct acc_hw *hw, unsigned int on) 
 {
+#ifdef __USE_LINUX_REGULATOR_FRAMEWORK__
+#else
 	static unsigned int power_on = 0;
 
 	if(hw->power_id != MT65XX_POWER_NONE)		// have externel LDO
@@ -882,7 +884,8 @@ static void MC3XXX_power(struct acc_hw *hw, unsigned int on)
 			}			  
 		}
 	}
-	power_on = on;    
+	power_on = on;
+#endif
 }
 
 #if 1

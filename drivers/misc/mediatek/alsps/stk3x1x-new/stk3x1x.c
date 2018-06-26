@@ -57,6 +57,7 @@
 #include <mach/mt_pm_ldo.h>
 
 /*------------------------- define-------------------------------*/
+#define CUST_EINT_ALS_TYPE 		    8
 #define CUST_EINT_ALS_SENSITIVE 	CUST_EINTF_TRIGGER_LOW 
 #define CUST_EINT_ALS_POLARITY 		CUST_EINT_ALS_TYPE
 #define POWER_NONE_MACRO MT65XX_POWER_NONE
@@ -955,6 +956,8 @@ int stk3x1x_write_aoffset(struct i2c_client *client,  u16 ofset)
 /*----------------------------------------------------------------------------*/
 static void stk3x1x_power(struct alsps_hw *hw, unsigned int on) 
 {
+#ifdef __USE_LINUX_REGULATOR_FRAMEWORK__
+#else
 	static unsigned int power_on = 0;
 
 	//APS_LOG("power %s\n", on ? "on" : "off");
@@ -981,6 +984,7 @@ static void stk3x1x_power(struct alsps_hw *hw, unsigned int on)
 		}
 	}
 	power_on = on;
+#endif
 }
 
 /*----------------------------------------------------------------------------*/
