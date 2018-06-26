@@ -10,8 +10,8 @@ static struct alsps_hw cust_alsps_hw = {
     .power_vol  = VOL_DEFAULT,          /*LDO is not used*/
     .i2c_addr   = {0x90, 0x00, 0x00, 0x00},	/*STK3x1x*/
 	//STK add for CCI start 20130113
-    .als_level  = {10, 40, 65, 90, 145, 225, 300, 550, 930, 1250, 1700, 2600, 5120, 7680, 10240},	// als_code for CCI VV01 TP transmittance = 10%
-	.als_value  = {0, 10, 40, 65, 90, 145, 225, 300, 550, 930, 1250, 1700, 2600, 5120, 7680, 10240},    /* lux */
+	.als_level  = {0,  66,  124, 250, 380, 508, 630, 820, 1003, 1255, 1884, 2510, 3664, 5520, 10240},   		 /* als_code */
+	.als_value  = {0,  50,  100, 200, 300, 400, 500, 650, 800, 1000, 1500, 2000, 3000, 4000, 8000, 10240},    	 /* lux */
 	//STK add for CCI end 20130113
 	//CCI set config start
 	//.state_val = 0x0,		/* disable all */
