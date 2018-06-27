@@ -13,8 +13,8 @@
  *     CMOS sensor header file
  *
  ****************************************************************************/
-#ifndef _GC2355MIPI_SENSOR_H
-#define _GC2355MIPI_SENSOR_H
+#ifndef _GC2755MIPI_SENSOR_H
+#define _GC2755MIPI_SENSOR_H
 
 
 typedef enum{
@@ -118,21 +118,21 @@ typedef struct imgsensor_info_struct {
 //#define IMGSENSOR_READ_ID_2  (0x21)
 
 // add by yfx
-#define GC2355_VALID_IXEL_NUMS            800
-#define GC2355_VALID_LINE_NUMS            1200
-#define GC2355_DEFAULT_DUMMY_PIXEL_NUMS   0x11c //244 
-#define GC2355_DEFAULT_DUMMY_LINE_NUMS    0x0e //64
+#define GC2755_VALID_IXEL_NUMS            800
+#define GC2755_VALID_LINE_NUMS            1200
+#define GC2755_DEFAULT_DUMMY_PIXEL_NUMS   0x11c //244 
+#define GC2755_DEFAULT_DUMMY_LINE_NUMS    0x0e //64
 
-#define GC2355_INTERNAL_DUMMY_PIXEL_NUMS  36
-#define GC2355_INTERNAL_DUMMY_LINE_NUMS   32
+#define GC2755_INTERNAL_DUMMY_PIXEL_NUMS  36
+#define GC2755_INTERNAL_DUMMY_LINE_NUMS   32
 
-#define GC2355_VIDEO_PERIOD_PIXEL_NUMS          (1120)
-#define GC2355_VIDEO_PERIOD_LINE_NUMS           (1246)
-#define GC2355_PV_PERIOD_PIXEL_NUMS            (1120)
-#define GC2355_PV_PERIOD_LINE_NUMS             (1246)
+#define GC2755_VIDEO_PERIOD_PIXEL_NUMS          (1120)
+#define GC2755_VIDEO_PERIOD_LINE_NUMS           (1246)
+#define GC2755_PV_PERIOD_PIXEL_NUMS            (1120)
+#define GC2755_PV_PERIOD_LINE_NUMS             (1246)
 
-#define GC2355_FULL_PERIOD_PIXEL_NUMS          (1120)
-#define GC2355_FULL_PERIOD_LINE_NUMS           (1246)
+#define GC2755_FULL_PERIOD_PIXEL_NUMS          (1120)
+#define GC2755_FULL_PERIOD_LINE_NUMS           (1246)
 
 
 // end
