@@ -1,194 +1,123 @@
-
 /*****************************************************************************
  *
  * Filename:
  * ---------
- *   imx219mipiraw_sensor.h
+ *	 OV5693mipi_Sensor.h
  *
  * Project:
  * --------
- *   YUSU
+ *	 ALPS
  *
  * Description:
  * ------------
- *   Header file of Sensor driver
+ *	 CMOS sensor header file
  *
- *
- * Author:
-
- *============================================================================
  ****************************************************************************/
-/* SENSOR FULL SIZE */
-#ifndef __SENSOR_H
-#define __SENSOR_H
-
-typedef enum group_enum {
-    PRE_GAIN=0,
-    CMMCLK_CURRENT,
-    FRAME_RATE_LIMITATION,
-    REGISTER_EDITOR,
-    GROUP_TOTAL_NUMS
-} FACTORY_GROUP_ENUM;
+#ifndef _IMX219MIPI_SENSOR_H
+#define _IMX219MIPI_SENSOR_H
 
 
-#define ENGINEER_START_ADDR 10
-#define FACTORY_START_ADDR 0
+typedef enum{
+	IMGSENSOR_MODE_INIT,
+	IMGSENSOR_MODE_PREVIEW,
+	IMGSENSOR_MODE_CAPTURE,
+	IMGSENSOR_MODE_VIDEO,
+	IMGSENSOR_MODE_HIGH_SPEED_VIDEO,
+	IMGSENSOR_MODE_SLIM_VIDEO,
+} IMGSENSOR_MODE;
 
-typedef enum engineer_index
-{
-    CMMCLK_CURRENT_INDEX=ENGINEER_START_ADDR,
-    ENGINEER_END
-} FACTORY_ENGINEER_INDEX;
-typedef enum register_index
-{
-	SENSOR_BASEGAIN=FACTORY_START_ADDR,
-	PRE_GAIN_R_INDEX,
-	PRE_GAIN_Gr_INDEX,
-	PRE_GAIN_Gb_INDEX,
-	PRE_GAIN_B_INDEX,
-	FACTORY_END_ADDR
-} FACTORY_REGISTER_INDEX;
+typedef struct imgsensor_mode_struct {
+	kal_uint32 pclk;				//record different mode's pclk
+	kal_uint32 linelength;			//record different mode's linelength
+	kal_uint32 framelength;			//record different mode's framelength
 
+	kal_uint8 startx;				//record different mode's startx of grabwindow
+	kal_uint8 starty;				//record different mode's startx of grabwindow
 
+	kal_uint16 grabwindow_width;	//record different mode's width of grabwindow
+	kal_uint16 grabwindow_height;	//record different mode's height of grabwindow
 
-typedef struct
-{
-    SENSOR_REG_STRUCT	Reg[ENGINEER_END];
-    SENSOR_REG_STRUCT	CCT[FACTORY_END_ADDR];
-} SENSOR_DATA_STRUCT, *PSENSOR_DATA_STRUCT;
+	/*	 following for MIPIDataLowPwr2HighSpeedSettleDelayCount by different scenario	*/
+	kal_uint8 mipi_data_lp2hs_settle_dc;
 
+	/*	 following for GetDefaultFramerateByScenario()	*/
+	kal_uint16 max_framerate;
+	
+} imgsensor_mode_struct;
 
-// Important Note:
-//     1. Make sure horizontal PV sensor output is larger than IMX219MIPI_REAL_PV_WIDTH  + 2 * IMX219MIPI_IMAGE_SENSOR_PV_STARTX + 4.
-//     2. Make sure vertical   PV sensor output is larger than IMX219MIPI_REAL_PV_HEIGHT + 2 * IMX219MIPI_IMAGE_SENSOR_PV_STARTY + 6.
-//     3. Make sure horizontal CAP sensor output is larger than IMX219MIPI_REAL_CAP_WIDTH  + 2 * IMX219MIPI_IMAGE_SENSOR_CAP_STARTX + IMAGE_SENSOR_H_DECIMATION*4.
-//     4. Make sure vertical   CAP sensor output is larger than IMX219MIPI_REAL_CAP_HEIGHT + 2 * IMX219MIPI_IMAGE_SENSOR_CAP_STARTY + IMAGE_SENSOR_V_DECIMATION*6.
-// Note:
-//     1. The reason why we choose REAL_PV_WIDTH/HEIGHT as tuning starting point is
-//        that if we choose REAL_CAP_WIDTH/HEIGHT as starting point, then:
-//            REAL_PV_WIDTH  = REAL_CAP_WIDTH  / IMAGE_SENSOR_H_DECIMATION
-//            REAL_PV_HEIGHT = REAL_CAP_HEIGHT / IMAGE_SENSOR_V_DECIMATION
-//        There might be some truncation error when dividing, which may cause a little view angle difference.
-//Macro for Resolution
-#define IMAGE_SENSOR_H_DECIMATION				2	// For current PV mode, take 1 line for every 2 lines in horizontal direction.
-#define IMAGE_SENSOR_V_DECIMATION				2	// For current PV mode, take 1 line for every 2 lines in vertical direction.
+/* SENSOR PRIVATE STRUCT FOR VARIABLES*/
+typedef struct imgsensor_struct {
+	kal_uint8 mirror;				//mirrorflip information
 
-#if 0
-#define IMX219MIPI_REAL_PV_WIDTH				1600//1640-40
-#define IMX219MIPI_REAL_PV_HEIGHT				1020//1050-30
-/* Real CAP Size, i.e. the size after all ISP processing (so already -4/-6), before MDP. */
-#define IMX219MIPI_REAL_CAP_WIDTH				3200//3280-80
-#define IMX219MIPI_REAL_CAP_HEIGHT				2400//2464-64
-#define IMX219MIPI_REAL_VIDEO_WIDTH				3272//3280-8
-#define IMX219MIPI_REAL_VIDEO_HEIGHT			1846//1852-6
-#endif
-#define IMX219MIPI_REAL_PV_WIDTH				1632//1640
-#define IMX219MIPI_REAL_PV_HEIGHT				1224//1232
-/* Real CAP Size, i.e. the size after all ISP processing (so already -4/-6), before MDP. */
-//#define IMX219MIPI_REAL_CAP_WIDTH				  2820 //3040 //7M Fail //2820//6M    //2560//5M   //3264-(4*200)//3280
-//#define IMX219MIPI_REAL_CAP_HEIGHT  			  1920 //2280 //2115	    //1920         //2448-(3*200)//2464
+	kal_uint8 sensor_mode;			//record IMGSENSOR_MODE enum value
 
-#define IMX219MIPI_REAL_CAP_WIDTH 			3264//3280
-#define IMX219MIPI_REAL_CAP_HEIGHT				2448//2464
+	kal_uint32 shutter;				//current shutter
+	kal_uint16 gain;				//current gain
+	
+	kal_uint32 pclk;				//current pclk
+
+	kal_uint32 frame_length;		//current framelength
+	kal_uint32 line_length;			//current linelength
+
+	kal_uint32 min_frame_length;	//current min  framelength to max framerate
+	kal_uint16 dummy_pixel;			//current dummypixel
+	kal_uint16 dummy_line;			//current dummline
+	
+	kal_uint16 current_fps;			//current max fps
+	kal_bool   autoflicker_en;		//record autoflicker enable or disable
+	kal_bool test_pattern;			//record test pattern mode or not
+	MSDK_SCENARIO_ID_ENUM current_scenario_id;//current scenario id
+	kal_uint8  ihdr_en;				//ihdr enable or disable
+	
+	kal_uint8 i2c_write_id;			//record current sensor's i2c write id
+} imgsensor_struct;
+
+/* SENSOR PRIVATE STRUCT FOR CONSTANT*/
+typedef struct imgsensor_info_struct { 
+	kal_uint32 sensor_id;			//record sensor id defined in Kd_imgsensor.h
+	kal_uint32 checksum_value;		//checksum value for Camera Auto Test
+	imgsensor_mode_struct pre;		//preview scenario relative information
+	imgsensor_mode_struct cap;		//capture scenario relative information
+	imgsensor_mode_struct cap1;		//capture for PIP 24fps relative information, capture1 mode must use same framelength, linelength with Capture mode for shutter calculate
+	imgsensor_mode_struct normal_video;//normal video  scenario relative information
+	imgsensor_mode_struct hs_video;	//high speed video scenario relative information
+	imgsensor_mode_struct slim_video;	//slim video for VT scenario relative information
+	
+	kal_uint8  ae_shut_delay_frame;	//shutter delay frame for AE cycle
+	kal_uint8  ae_sensor_gain_delay_frame;	//sensor gain delay frame for AE cycle
+	kal_uint8  ae_ispGain_delay_frame;	//isp gain delay frame for AE cycle
+	kal_uint8  ihdr_support;		//1, support; 0,not support
+	kal_uint8  ihdr_le_firstline;	//1,le first ; 0, se first
+	kal_uint8  sensor_mode_num;		//support sensor mode num
+	
+	kal_uint8  cap_delay_frame;		//enter capture delay frame num
+	kal_uint8  pre_delay_frame;		//enter preview delay frame num
+	kal_uint8  video_delay_frame;	//enter video delay frame num
+	kal_uint8  hs_video_delay_frame;	//enter high speed video  delay frame num
+	kal_uint8  slim_video_delay_frame;	//enter slim video delay frame num
   
+	kal_uint8  margin;				//sensor framelength & shutter margin 
+	kal_uint32 min_shutter;			//min shutter
+	kal_uint32 max_frame_length;	//max framelength by sensor register's limitation
 
-//#define IMX219MIPI_REAL_CAP_WIDTH				3264//3280
-//#define IMX219MIPI_REAL_CAP_HEIGHT				2448//2464
-#define IMX219MIPI_REAL_VIDEO_WIDTH				3280-16//3272-16//3280-8
-#define IMX219MIPI_REAL_VIDEO_HEIGHT			1845-9 //xb.pang //1852-6
+	kal_uint8  isp_driving_current;	//mclk driving current
+	kal_uint8  sensor_interface_type;//sensor_interface_type
+	kal_uint8  mipi_sensor_type; //0,MIPI_OPHY_NCSI2; 1,MIPI_OPHY_CSI2, default is NCSI2, don't modify this para
+	kal_uint8  mipi_settle_delay_mode; //0, high speed signal auto detect; 1, use settle delay,unit is ns, default is auto detect, don't modify this para
+	kal_uint8  sensor_output_dataformat;//sensor output first pixel color
+	kal_uint8  mclk;				//mclk value, suggest 24 or 26 for 24Mhz or 26Mhz
+	
+	kal_uint8  mipi_lane_num;		//mipi lane num
+	kal_uint8  i2c_addr_table[5];	//record sensor support all write id addr, only supprt 4must end with 0xff
+} imgsensor_info_struct;
 
-/* X/Y Starting point */
-#define IMX219MIPI_IMAGE_SENSOR_PV_STARTX       2
-#define IMX219MIPI_IMAGE_SENSOR_PV_STARTY       2	// The value must bigger or equal than 1.
-#define IMX219MIPI_IMAGE_SENSOR_CAP_STARTX		4   //(IMX219MIPI_IMAGE_SENSOR_PV_STARTX * IMAGE_SENSOR_H_DECIMATION)
-#define IMX219MIPI_IMAGE_SENSOR_CAP_STARTY		4   //(IMX219MIPI_IMAGE_SENSOR_PV_STARTY * IMAGE_SENSOR_V_DECIMATION)		// The value must bigger or equal than 1.
-#define IMX219MIPI_IMAGE_SENSOR_VIDEO_STARTX    2 //xb.pang
-#define IMX219MIPI_IMAGE_SENSOR_VIDEO_STARTY    2	//xb.pang The value must bigger or equal than 1.
+/* SENSOR READ/WRITE ID */
+//#define IMGSENSOR_WRITE_ID_1 (0x6c)
+//#define IMGSENSOR_READ_ID_1  (0x6d)
+//#define IMGSENSOR_WRITE_ID_2 (0x20)
+//#define IMGSENSOR_READ_ID_2  (0x21)
 
+extern int iReadRegI2C(u8 *a_pSendData , u16 a_sizeSendData, u8 * a_pRecvData, u16 a_sizeRecvData, u16 i2cId);
+extern int iWriteRegI2C(u8 *a_pSendData , u16 a_sizeSendData, u16 i2cId);
 
-#define IMX219MIPI_PV_LINE_LENGTH_PIXELS 						(0xd78)
-#define IMX219MIPI_PV_FRAME_LENGTH_LINES						(0x9ca)	
-//#define IMX219MIPI_FULL_LINE_LENGTH_PIXELS 						(0xd78)
-//#define IMX219MIPI_FULL_FRAME_LENGTH_LINES			            (0xeae)
-#define IMX219MIPI_FULL_LINE_LENGTH_PIXELS 						0xd78//4383//3783//(0xdff)
-#define IMX219MIPI_FULL_FRAME_LENGTH_LINES			            0x9c8//0xa68//0xc5c//3664//2864//(0x9ff)
-
-#define IMX219MIPI_VIDEO_LINE_LENGTH_PIXELS 					(0xd78)
-#define IMX219MIPI_VIDEO_FRAME_LENGTH_LINES						(0x9ca)
-
-//base gain
-#define IMX219MIPI_BASE_GAIN   64
-
-
-
-//define PCLK
-#define IMX219MIPI_CAPTURE_CLK 	(259200000)
-#define IMX219MIPI_PREVIEW_CLK 	(259200000)
-#define IMX219MIPI_VIDEO_CLK		(259200000)
-
-
-//define MAX FrameRate
-#define IMX219MIPI_CAPTURE_MAX_FRAMERATE 	30
-#define IMX219MIPI_PREVIEW_MAX_FRAMERATE 	30
-#define IMX219MIPI_VIDEO_MAX_FRAMERATE		30
-#define IMX219MIPI_WEB_CAM_CAPTURE_MAX_FRAMERATE 	30
-#define IMX219MIPI_3D_PREVIEW_MAX_FRAMERATE 30
-
-
-#define IMX219MIPI_WRITE_ID (0x20)
-#define IMX219MIPI_READ_ID	(0x21)
-
-/* SENSOR PRIVATE STRUCT */
-struct IMX219_SENSOR_STRUCT
-{
-	kal_uint8 i2c_write_id;
-	kal_uint8 i2c_read_id;
-
-};
-struct IMX219MIPI_sensor_STRUCT
-	{	 
-		  kal_uint16 i2c_write_id;
-		  kal_uint16 i2c_read_id;
-		  kal_bool first_init;
-		  kal_bool fix_video_fps;
-		  kal_bool pv_mode; 
-		  kal_bool video_mode; 				
-		  kal_bool capture_mode; 				//True: Preview Mode; False: Capture Mode
-		  kal_bool night_mode;				//True: Night Mode; False: Auto Mode
-		  kal_uint8 mirror_flip;
-		  kal_uint32 pv_pclk;				//Preview Pclk
-		  kal_uint32 video_pclk;				//video Pclk
-		  kal_uint32 cp_pclk;				//Capture Pclk
-		  kal_uint32 pv_shutter;		   
-		  kal_uint32 video_shutter;		   
-		  kal_uint32 cp_shutter;
-		  kal_uint32 pv_gain;
-		  kal_uint32 video_gain;
-		  kal_uint32 cp_gain;
-		  kal_uint32 pv_line_length;
-		  kal_uint32 pv_frame_length;
-		  kal_uint32 video_line_length;
-		  kal_uint32 video_frame_length;
-		  kal_uint32 cp_line_length;
-		  kal_uint32 cp_frame_length;
-		  kal_uint16 pv_dummy_pixels;		   //Dummy Pixels:must be 12s
-		  kal_uint16 pv_dummy_lines;		   //Dummy Lines
-		  kal_uint16 video_dummy_pixels;		   //Dummy Pixels:must be 12s
-		  kal_uint16 video_dummy_lines;		   //Dummy Lines
-		  kal_uint16 cp_dummy_pixels;		   //Dummy Pixels:must be 12s
-		  kal_uint16 cp_dummy_lines;		   //Dummy Lines			
-		  kal_uint16 video_current_frame_rate;
-	};
-// SENSOR CHIP VERSION
-#define IMX219MIPI_SENSOR_ID            IMX219_SENSOR_ID
-#define IMX219MIPI_PAGE_SETTING_REG    (0xFF)
-
-UINT32 IMX219MIPIOpen(void);
-UINT32 IMX219MIPIGetResolution(MSDK_SENSOR_RESOLUTION_INFO_STRUCT *pSensorResolution);
-UINT32 IMX219MIPIGetInfo(MSDK_SCENARIO_ID_ENUM ScenarioId, MSDK_SENSOR_INFO_STRUCT *pSensorInfo, MSDK_SENSOR_CONFIG_STRUCT *pSensorConfigData);
-UINT32 IMX219MIPIControl(MSDK_SCENARIO_ID_ENUM ScenarioId, MSDK_SENSOR_EXPOSURE_WINDOW_STRUCT *pImageWindow, MSDK_SENSOR_CONFIG_STRUCT *pSensorConfigData);
-UINT32 IMX219MIPIFeatureControl(MSDK_SENSOR_FEATURE_ENUM FeatureId, UINT8 *pFeaturePara,UINT32 *pFeatureParaLen);
-UINT32 IMX219MIPIClose(void);
-
-#endif /* __SENSOR_H */
-
+#endif 
