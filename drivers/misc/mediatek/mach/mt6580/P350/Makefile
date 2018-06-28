@@ -10,7 +10,7 @@ endif
 ifneq ($(CONFIG_ARM64), y)
 obj-y   +=  camera/camera/
 endif
-obj-y   +=  flashlight/constant_flashlight/
+obj-$(CONFIG_MTK_FLASHLIGHT)   +=  flashlight/
 obj-$(CONFIG_MTK_VIBRATOR)   +=  vibrator/
 obj-$(CONFIG_MTK_LEDS)   +=  leds/
 #obj-y   +=  keypad/
