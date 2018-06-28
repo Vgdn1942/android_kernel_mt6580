@@ -28,8 +28,7 @@
 #define PLATFORM_DRIVER_NAME "lens_actuator_dw9714af"
 #define AF_DRIVER_CLASS_NAME "actuatordrv_dw9714af"
 
-//static struct i2c_board_info __initdata kd_lens_dev={ I2C_BOARD_INFO(AF_DRVNAME, I2C_REGISTER_ID)};
-static struct i2c_board_info __initdata kd_lens_dev={ I2C_BOARD_INFO(AF_DRVNAME, 0x19)};
+static struct i2c_board_info __initdata kd_lens_dev={ I2C_BOARD_INFO(AF_DRVNAME, I2C_REGISTER_ID)};
 #define AF_DEBUG
 #ifdef AF_DEBUG
 #define LOG_INF(format, args...) pr_debug(AF_DRVNAME " [%s] " format, __FUNCTION__, ##args)

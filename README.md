@@ -12,7 +12,7 @@ This is 3.10.x MT6580 kernel source ported to be used on DEXP Ixion P350.
 | ALS/PS | `stk3x1x (i2c 2-0048)` | Yes | Yes |
 | Flash | `Samsung F722MB` | Yes | Yes |
 | Lens #1 | `DW9714AF (i2c 0-0018)` | Yes | Yes |
-| Lens #2 | `BU6424AF (i2c 0-0019)` | Yes | ? |
+| Lens #2 | `BU6424AF (i2c 0-0019)` | Yes | Yes |
 | RAM | `1 GB LPDDR3_1066` | - | Yes |
 | Sound | `mtsndcard` | - | Yes |
 | Other | `kd_camera_hw (i2c 0-007f)` | - | Yes |
