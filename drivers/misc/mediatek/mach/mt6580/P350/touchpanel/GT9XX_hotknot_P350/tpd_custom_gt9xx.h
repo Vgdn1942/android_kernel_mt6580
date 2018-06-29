@@ -111,7 +111,7 @@
 #define GTP_CONFIG_MAX_LENGTH       240
 #define GTP_CHARGER_SWITCH    0       // charger plugin & plugout detect
 #define GTP_WITH_PEN          0       
-#define GTP_GESTURE_WAKEUP    0
+#define GTP_GESTURE_WAKEUP    1
 
 #define HOTKNOT_BLOCK_RW      0        // hotknot blcoking read and write
 

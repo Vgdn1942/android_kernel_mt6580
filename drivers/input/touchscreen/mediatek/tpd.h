@@ -93,6 +93,9 @@ struct tpd_device {
 	struct timer_list timer;
 	struct tasklet_struct tasklet;
 	int btn_state;
+	char *hq_ctp_module_name;
+	int hq_ctp_module_id;
+	int hq_ctp_firmware_version;
 };
 #if !defined(CONFIG_MTK_LEGACY)
 struct tpd_key_dim_local{

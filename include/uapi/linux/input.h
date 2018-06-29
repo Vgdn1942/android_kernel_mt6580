@@ -477,6 +477,15 @@ struct input_keymap_entry {
 #define KEY_HALLCLOSE	250	
 /* Code 255 is reserved for special needs of AT keyboard driver */
 
+/*add for GT9XX handgesture*/
+#define KEY_GESTURE_C    0x230
+#define KEY_GESTURE_E    0x231
+#define KEY_GESTURE_S    0x232
+#define KEY_GESTURE_V    0x233
+#define KEY_GESTURE_W    0x234
+#define KEY_GESTURE_Z    0x235
+#define KEY_GESTURE_CC   0x236
+
 #define BTN_MISC		0x100
 #define BTN_0			0x100
 #define BTN_1			0x101

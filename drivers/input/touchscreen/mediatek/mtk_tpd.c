@@ -36,6 +36,7 @@
 #if defined(CONFIG_MTK_S3320) || defined(CONFIG_MTK_S3320_50) || defined(CONFIG_MTK_S3320_47) || defined(CONFIG_MTK_MIT200) || defined(CONFIG_TOUCHSCREEN_SYNAPTICS_S3528) || defined(CONFIG_MTK_S7020)
 #include <linux/input/mt.h>
 #endif /* CONFIG_MTK_S3320 */
+#include <mach/mt_boot_common.h>
 /* for magnify velocity******************************************** */
 #define TOUCH_IOC_MAGIC 'A'
 
@@ -46,6 +47,7 @@
 #define COMPAT_TPD_GET_FILTER_PARA _IOWR(TOUCH_IOC_MAGIC,2,struct tpd_filter_t) 
 #endif
 
+#define TPD_SET_GESTURE_STATE 		_IOW(TOUCH_IOC_MAGIC,3,int)
 
 extern int tpd_v_magnify_x;
 extern int tpd_v_magnify_y;
@@ -57,6 +59,7 @@ struct pinctrl_state *pins_default;
 struct pinctrl_state *eint_as_int, *eint_output, *rst_output0, *rst_output1;
 #endif
 
+static int gesture_en = 0;
 extern UINT32 DISP_GetScreenHeight(void);
 extern UINT32 DISP_GetScreenWidth(void);
 #if defined(CONFIG_MTK_S3320) || defined(CONFIG_MTK_S3320_47)|| defined(CONFIG_MTK_S3320_50)
@@ -222,6 +225,7 @@ static long tpd_unlocked_ioctl(struct file *file, unsigned int cmd, unsigned lon
 	void __user *data;
 
 	long err = 0;
+	int enable;
 
 	if (_IOC_DIR(cmd) & _IOC_READ) {
 		err = !access_ok(VERIFY_WRITE, (void __user *)arg, _IOC_SIZE(cmd));
@@ -280,6 +284,27 @@ static long tpd_unlocked_ioctl(struct file *file, unsigned int cmd, unsigned lon
                 err = -EFAULT;
                 break;
             }
+            break;
+
+        case TPD_SET_GESTURE_STATE: //erick add for tp gesture
+            data = (void __user *) arg;
+		
+            if (data == NULL)
+            {
+                err = -EINVAL;
+                printk("tpd-gesture: TPD_SET_GESTURE_STATE IOCTL CMD: data is null\n");
+                break;
+            }
+
+            if(copy_from_user(&enable, data, sizeof(enable)))
+            {
+                printk("tpd-gesture: TPD_SET_GESTURE_STATE IOCTL CMD: copy data error\n");
+                err = -EFAULT;
+                break;
+            }
+
+            gesture_en = enable;
+            //printk("tpd-gesture:%s,  gesture_en=%d\n", __func__, gesture_en);
             break;
 
 	default:
@@ -370,7 +395,7 @@ static struct platform_driver tpd_driver = {
 #endif
 	},
 };
-static struct tpd_driver_t *g_tpd_drv = NULL;
+struct tpd_driver_t *g_tpd_drv = NULL;
 
 /*20091105, Kelvin, re-locate touch screen driver to earlysuspend*/
 #ifdef CONFIG_HAS_EARLYSUSPEND
@@ -397,6 +422,8 @@ static int tpd_fb_notifier_callback(struct notifier_block *self, unsigned long e
 	/* If we aren't interested in this event, skip it immediately ... */
 	if (event != FB_EVENT_BLANK)
 		return 0;
+
+struct tpd_driver_t *g_tpd_drv;
 
 	blank = *(int *)evdata->data;
 	TPD_DMESG("fb_notify(blank=%d)\n", blank);
@@ -547,12 +574,44 @@ static void tpd_create_attributes(struct device *dev, struct tpd_attrs *attrs)
 		device_create_file(dev, attrs->attr[--num]);
 }
 
-/* touch panel probe */
+static ssize_t show_tpd_gesture_state(struct device *dev, struct device_attribute *attr,
+					char *buf)
+{
+	return sprintf(buf, "%d\n", gesture_en);
+}
+
+static ssize_t store_tpd_gesture_state(struct device *dev, struct device_attribute *attr,
+					 const char *buf, size_t size)
+{
+	if(!strncmp(buf, "1", 1)) 
+	{
+		gesture_en = 1;
+	}
+	else if(!strncmp(buf, "0", 1))
+	{
+		gesture_en = 0;
+	}
+		
+	return size;
+}
+
+static DEVICE_ATTR(tpd_gesture_state, 0666, show_tpd_gesture_state, store_tpd_gesture_state);
+
+int tpd_get_gesture_state(void)
+{
+	return gesture_en;
+}
+
+ /* touch panel probe */
+extern BOOTMODE get_boot_mode(void);
+
 static int tpd_probe(struct platform_device *pdev)
 {
 	int touch_type = 1;	/* 0:R-touch, 1: Cap-touch */
 	int i = 0;
 	TPD_DMESG("enter %s, %d\n", __func__, __LINE__);
+	if((get_boot_mode()==META_BOOT) || (get_boot_mode()==ADVMETA_BOOT))
+	return -1;
 	/* Select R-Touch */
 	/* if(g_tpd_drv == NULL||tpd_load_status == 0) */
 #if 0
@@ -743,6 +802,8 @@ static int tpd_probe(struct platform_device *pdev)
 	if(device_create_file(&pdev->dev, &dev_attr_tpd_fw_chip_info)) {
 		TPD_DMESG("create touch_info file error--Liu\n");
 	}
+
+	device_create_file(&pdev->dev, &dev_attr_tpd_gesture_state);
 	return 0;
 }
 #ifndef CONFIG_HAS_EARLYSUSPEND
